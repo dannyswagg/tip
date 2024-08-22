@@ -1,14 +1,11 @@
 import React from "react";
+import logo from "../assests/logo.svg";
 
 const Header = () => {
   return (
     <>
-      <header className="">
-        <h1 className="text-md text-center font-bold uppercase mb-10">
-          spli
-          <br />
-          tter
-        </h1>
+      <header className="flex justify-center my-20">
+        <img src={logo} alt="logo" />
       </header>
     </>
   );
