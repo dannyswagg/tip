@@ -1,39 +1,68 @@
-import React, { useState } from "react";
-import dollar from "../../src/assests/dollar.svg";
-import person from "../assests/person.svg";
+import React, { useState, useCallback } from "react";
+import dollar from "../../src/assets/dollar.svg";
+import person from "../assets/person.svg";
 
 const InputCard = () => {
-  const [tip, setTip] = useState(0);
-  const [user, setUser] = useState(0);
-  const tiping = ["5", "10", "15", "25", "50", "Custom"];
+  const [price, setPrice] = useState("");
+  const [users, setUsers] = useState("");
+  const [selectedTip, setSelectedTip] = useState(null);
   const [customTip, setCustomTip] = useState("");
+  const [tipPerPerson, setTipPerPerson] = useState("");
+  const tips = ["5", "10", "15", "25", "50", "Custom"];
+
+  // Debounce function
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  const handleTipClick = (tip) => {
+    setSelectedTip(tip);
+    if (tip !== "Custom") {
+      setCustomTip(""); // Clear custom input if a predefined tip is selected
+    }
+  };
 
   const handleCustomTipChange = (event) => {
     setCustomTip(event.target.value);
+    debouncedCalculateTip(event.target.value); // Use the debounced function
   };
 
-  const handleChange = (event) => {
-    const value = event.target.value;
-    if (/^\d*$/.test(value)) {
-      setTip(value);
+  const calculateTipPerPerson = () => {
+    const billAmount = parseFloat(price);
+    const tipPercentage =
+      selectedTip === "Custom"
+        ? parseFloat(customTip)
+        : parseFloat(selectedTip);
+    const peopleCount = parseInt(users, 10);
+
+    if (!isNaN(billAmount) && !isNaN(tipPercentage) && peopleCount > 0) {
+      const tipAmount = (billAmount * tipPercentage) / 100;
+      const totalAmount = billAmount + tipAmount;
+      const perPersonTip = tipAmount / peopleCount;
+      setTipPerPerson(perPersonTip.toFixed(2));
+      console.log("Tip per person:", perPersonTip);
+      console.log("Total per person:", (totalAmount / peopleCount).toFixed(2));
     }
   };
 
-  const tipPercentage = (value) => {
-    console.log(value);
-    // You can perform other actions with the value here
-  };
-
-  const handleCustomTipBlur = () => {
-    if (customTip) {
-      tipPercentage(customTip);
-    }
-  };
+  // Memoize debounced function
+  const debouncedCalculateTip = useCallback(
+    debounce(calculateTipPerPerson, 200),
+    [price, customTip, selectedTip, users]
+  );
 
   return (
     <>
-      <div className="w-2/4 mr-2 rounded-md p-1 flex flex-col justify-between">
-        <div className="grid relative">
+      <div className="w-full md:w-2/4 mr-2 rounded-md p-1 flex flex-col justify-between">
+        <div className="grid relative mb-5">
           <img
             className="absolute top-1/2 left-3 transform -translate-x-1/2 -translate-y-1/2 my-3"
             src={dollar}
@@ -44,33 +73,36 @@ const InputCard = () => {
             Bill
           </label>
           <input
-            className="text-darkCyan font-bold rounded-md px-3 py-2 text-right  border-2 border-white bg-lighterGreyCyan focus:outline-none focus:border-2 focus:border-strongCyan"
+            className="text-darkCyan font-bold rounded-md px-1 py-3 text-right  border-2 border-white
+             bg-lighterGreyCyan focus:outline-none focus:border-2 focus:border-strongCyan"
             id="bill"
             type="text"
             placeholder="0"
-            value={tip}
-            onChange={handleChange}
+            value={price}
+            onChange={(e) => {
+              setPrice(e.target.value);
+              debouncedCalculateTip();
+            }}
           />
         </div>
-        <div className="">
+        <div className="mb-5">
           <p className="mb-2 text-xs font-bold">Select Tip %</p>
-          <ul className="grid grid-cols-3 gap-1">
-            {tiping.map((tips, index) => {
-              if (tips === "Custom") {
+          <ul className="grid grid-cols-3 gap-2">
+            {tips.map((tip, index) => {
+              if (tip === "Custom") {
                 return (
-                  <li
-                    key={index}
-                    className="bg-darkCyan text-lighterGreyCyan font-bold text-center 
-                    rounded-[5px] py-2 cursor-pointer"
-                  >
+                  <li key={index}>
                     <input
                       type="text"
                       value={customTip}
                       onChange={handleCustomTipChange}
-                      onBlur={handleCustomTipBlur}
+                      onClick={() => handleTipClick("Custom")}
                       placeholder="Custom"
-                      className="bg-darkCyan text-lighterGreyCyan text-center w-full 
-                      rounded-[5px] py-1 outline-none"
+                      className=" bg-darkCyan border-2 border-x-white text-lighterGreyCyan 
+                      placeholder:text-lighterGreyCyan
+                       font-bold rounded-[5px] py-2 placeholder:text-center px-2 w-full outline-none text-right 
+                       focus:bg-transparent focus:bg-none hover:text-darkCyan hover:text-[bg-transparent]
+                        focus:border-2 focus:border-strongCyan"
                     />
                   </li>
                 );
@@ -78,11 +110,11 @@ const InputCard = () => {
                 return (
                   <li
                     key={index}
-                    className="bg-darkCyan text-lighterGreyCyan font-bold text-center 
+                    className="bg-darkCyan text-lighterGreyCyan font-bold text-center
                     rounded-[5px] py-2 cursor-pointer hover:bg-main hover:text-darkCyan"
-                    onClick={() => tipPercentage(tips)}
+                    onClick={() => handleTipClick(tip)}
                   >
-                    {tips}%
+                    {tip}%
                   </li>
                 );
               }
@@ -104,11 +136,16 @@ const InputCard = () => {
             </label>
           </div>
           <input
-            className="text-darkCyan font-bold rounded-md px-3 py-2 text-right bg-lighterGreyCyan 
+            className="text-darkCyan font-bold rounded-md px-1 py-2 text-right bg-lighterGreyCyan 
             border-2 border-white focus:outline-none focus:border-2 focus:border-strongCyan"
             id="numb"
             type="text"
             placeholder="0"
+            value={users}
+            onChange={(e) => {
+              setUsers(e.target.value);
+              debouncedCalculateTip();
+            }}
           />
         </div>
       </div>

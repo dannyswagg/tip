@@ -1,10 +1,10 @@
 import React from "react";
-import logo from "../assests/logo.svg";
+import logo from "../assets/logo.svg";
 
 const Header = () => {
   return (
     <>
-      <header className="flex justify-center my-20">
+      <header className="flex justify-center">
         <img src={logo} alt="logo" />
       </header>
     </>
