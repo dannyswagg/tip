@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useContext, useState, useCallback } from "react";
 import dollar from "../../src/assets/dollar.svg";
 import person from "../assets/person.svg";
+import { AppContext } from "../context/AppContext";
 
 const InputCard = () => {
   const [price, setPrice] = useState("");
@@ -9,6 +10,8 @@ const InputCard = () => {
   const [customTip, setCustomTip] = useState("");
   const [tipPerPerson, setTipPerPerson] = useState("");
   const tips = ["5", "10", "15", "25", "50", "Custom"];
+
+  const { setPerPersonTip, setAmount } = useContext(AppContext);
 
   // Debounce function
   const debounce = (func, delay) => {
@@ -47,9 +50,14 @@ const InputCard = () => {
       const tipAmount = (billAmount * tipPercentage) / 100;
       const totalAmount = billAmount + tipAmount;
       const perPersonTip = tipAmount / peopleCount;
+      const amount = (totalAmount / peopleCount).toFixed(2);
       setTipPerPerson(perPersonTip.toFixed(2));
+
+      setPerPersonTip(perPersonTip.toFixed(2));
+      setAmount(amount);
+
       console.log("Tip per person:", perPersonTip);
-      console.log("Total per person:", (totalAmount / peopleCount).toFixed(2));
+      console.log("Total per person:", amount);
     }
   };
 
@@ -87,7 +95,7 @@ const InputCard = () => {
         </div>
         <div className="mb-5">
           <p className="mb-2 text-xs font-bold">Select Tip %</p>
-          <ul className="grid grid-cols-3 gap-2">
+          <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {tips.map((tip, index) => {
               if (tip === "Custom") {
                 return (
