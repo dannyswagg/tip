@@ -74,7 +74,10 @@ const InputCard = () => {
             src={dollar}
             alt="dollar sign"
           />
-          <label htmlFor="bill" className="mb-2 text-xs font-bold">
+          <label
+            htmlFor="bill"
+            className="text-darkGreyCyan mb-2 text-xs font-bold"
+          >
             Bill
           </label>
           <input
@@ -87,7 +90,9 @@ const InputCard = () => {
           />
         </div>
         <div className="mb-5">
-          <p className="mb-2 text-xs font-bold">Select Tip %</p>
+          <p className="mb-2 text-xs font-bold text-darkGreyCyan">
+            Select Tip %
+          </p>
           <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {tips.map((tip, index) => {
               if (tip === "Custom") {
@@ -99,9 +104,9 @@ const InputCard = () => {
                       onChange={handleCustomTipChange}
                       onClick={() => handleTipClick("Custom")}
                       placeholder="Custom"
-                      className="w-full bg-darkCyan text-lighterGreyCyan text-right rounded-[5px] px-2 py-2 focus:bg-none
-                      placeholder:text-center placeholder:text-lighterGreyCyan outline-none focus:bg-lighterGreyCyan 
-                      border-2 border-darkCyan hover:text-darkCyan focus:border-2 focus:border-strongCyan focus:text-darkCyan"
+                      className="w-full bg-lighterGreyCyan text-lighterGreyCyan text-right rounded-[5px] px-2 py-[5px] focus:bg-none
+                      placeholder:text-center placeholder:text-darkGreyCyan outline-none focus:bg-lighterGreyCyan 
+                      border-2 border-transparent hover:text-darkCyan focus:border-2 focus:border-strongCyan focus:text-darkCyan"
                     />
                   </li>
                 );
@@ -127,7 +132,10 @@ const InputCard = () => {
               src={person}
               alt="person"
             />
-            <label htmlFor="numb" className="mb-2 text-xs font-bold">
+            <label
+              htmlFor="numb"
+              className="text-darkGreyCyan mb-2 text-xs font-bold"
+            >
               Number of People
             </label>
             {showError && (
